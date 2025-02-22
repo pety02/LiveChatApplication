@@ -4,6 +4,5 @@ import com.example.livechat.dto.UserDTO;
 
 public interface UserService {
     UserDTO register(UserDTO userDTO);
-    UserDTO login(UserDTO login);
-    void logout();
+    UserDTO login(UserDTO userDTO);
 }
