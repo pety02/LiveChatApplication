@@ -1,8 +1,10 @@
 package com.example.livechat.web;
 
+import com.example.livechat.dto.RegisterUserDTO;
 import com.example.livechat.dto.UserDTO;
 import com.example.livechat.service.interfaces.UserService;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import static org.springframework.validation.BindingResult.MODEL_KEY_PREFIX;
 
 @Controller
+@Slf4j
 public class UserController {
     private final UserService userService;
 
@@ -23,72 +26,86 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/register")
-    public String getRegistrationForm(HttpSession httpSession,
-                                      Model model) {
-        if(httpSession.getAttribute("loggedInUserDTO") != null) {
-            httpSession.invalidate();
-        }
-        if(!model.containsAttribute("registeredUserDTO")) {
-            model.addAttribute("registerUserDTO", new UserDTO());
-        }
-        return "register";
-    }
-
     @PostMapping("/register")
-    public String register(@ModelAttribute UserDTO userDTO,
+    public String register(@ModelAttribute RegisterUserDTO userDTO,
                            BindingResult bindingResult,
                            RedirectAttributes redirectAttributes,
                            HttpSession httpSession) {
         if(httpSession.getAttribute("loggedInUserDTO") != null) {
             httpSession.invalidate();
         }
-        if(bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("bindingResult", bindingResult);
-            redirectAttributes.addFlashAttribute(MODEL_KEY_PREFIX + "registeredUser", userDTO);
-            return "redirect:/register";
+        if (bindingResult.hasErrors()) {
+            log.error("Error registering user: {}", bindingResult.getAllErrors());
+            redirectAttributes.addFlashAttribute("registeredUserDTO", userDTO);
+            redirectAttributes.addFlashAttribute(MODEL_KEY_PREFIX + "registeredUserDTO", bindingResult);
+            return "redirect:register";
         }
-        UserDTO registeredUserDTO = userService.register(userDTO);
-        if(registeredUserDTO == null) {
-            redirectAttributes.addFlashAttribute("errors", "Registration failed. Please, try again!");
-            redirectAttributes.addFlashAttribute("registeredUser", registeredUserDTO);
-            return "redirect:/register";
-        }
-        return "redirect:/login";
-    }
+        try {
+            if(!userDTO.getPassword().equals(userDTO.getConfirmPassword())) {
+                String errors = "Password and ConfirmPassword mismatch.";
+                redirectAttributes.addFlashAttribute("errors", errors);
 
-    @GetMapping("/login")
-    public String getLoginForm(HttpSession httpSession,
-                               Model model) {
-        if(httpSession.getAttribute("loggedInUserDTO") != null) {
-            httpSession.invalidate();
+                if (!redirectAttributes.containsAttribute("registeredUserDTO")) {
+                    redirectAttributes.addFlashAttribute("registeredUserDTO", userDTO);
+                }
+                return "redirect:register";
+            }
+            RegisterUserDTO registeredUser = userService.register(userDTO);
+
+            if (registeredUser == null) {
+                String errors = "Invalid user registration data.";
+                redirectAttributes.addFlashAttribute("errors", errors);
+
+                if (!redirectAttributes.containsAttribute("registeredUserDTO")) {
+                    redirectAttributes.addFlashAttribute("registeredUserDTO", userDTO);
+                }
+                return "redirect:register";
+            }
+
+            if (!redirectAttributes.containsAttribute("registeredUserDTO")) {
+                redirectAttributes.addFlashAttribute("registeredUserDTO", userDTO);
+            }
+            return "redirect:login";
+        } catch (Exception e) {
+            if (!redirectAttributes.containsAttribute("registeredUserDTO")) {
+                redirectAttributes.addFlashAttribute("registeredUserDTO", userDTO);
+            }
+            return "redirect:register";
         }
-        if(!model.containsAttribute("loggedInUserDTO")) {
-            model.addAttribute("loggedInUserDTO", new UserDTO());
-        }
-        return "login";
     }
 
     @PostMapping("/login")
     public String login(@ModelAttribute UserDTO userDTO,
                         BindingResult bindingResult,
+                        Model model,
                         RedirectAttributes redirectAttributes,
                         HttpSession httpSession) {
         if(httpSession.getAttribute("loggedInUserDTO") != null) {
             httpSession.invalidate();
         }
-        if(bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("bindingResult", bindingResult);
-            redirectAttributes.addFlashAttribute(MODEL_KEY_PREFIX + "loggedInUser", userDTO);
-            return "redirect:/login";
+        if (bindingResult.hasErrors()) {
+            log.error("Error logging user in: {}", bindingResult.getAllErrors());
+            redirectAttributes.addFlashAttribute("loggedInUser", userDTO);
+            redirectAttributes.addFlashAttribute(MODEL_KEY_PREFIX + "loggedInUser", bindingResult);
+            return "redirect:login";
         }
-        UserDTO loggedInUser = userService.login(userDTO);
-        if(loggedInUser == null) {
-            redirectAttributes.addFlashAttribute("errors", "Login failed because of incorrect username or password. Please, try again!");
-            redirectAttributes.addFlashAttribute("loggedInUser", loggedInUser);
-            return "redirect:/login";
+        try {
+            UserDTO loggedInUser = userService.login(userDTO);
+            if (loggedInUser == null) {
+                String errors = "Invalid user credentials.";
+                redirectAttributes.addAttribute("errors", errors);
+                return "redirect:login";
+            }
+
+            httpSession.setAttribute("loggedInUser", loggedInUser);
+
+            return "redirect:/home";
+        } catch (Exception e) {
+            if (!model.containsAttribute("loggedInUser")) {
+                model.addAttribute("loggedInUser", userDTO);
+            }
+            return "redirect:login";
         }
-        return "home";
     }
 
     @GetMapping("/logout")

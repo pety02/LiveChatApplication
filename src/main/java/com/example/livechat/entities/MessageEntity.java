@@ -1,6 +1,6 @@
-package com.example.livechat.entites;
+package com.example.livechat.entities;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
 

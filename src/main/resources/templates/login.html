@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+<form th:action="@{/login}" th:object="${loggedInUserDTO}" th:method="POST">
+    <div>
+        <label for="username"></label>
+        <input type="text" name="username" id="username" th:field="*{username}" placeholder="Enter Username">
+        <div th:if="${#fields.hasErrors('username')}"
+             data-err-alert>
+            <span th:errors="*{username}"></span>
+        </div>
+    </div>
+    <div>
+        <label for="password"></label>
+        <input type="password" name="password" id="password" th:field="*{password}" placeholder="Enter Password">
+        <div th:if="${#fields.hasErrors('password')}"
+             data-err-alert>
+            <span th:errors="*{password}"></span>
+        </div>
+    </div>
+    <button type="submit">Login</button>
+    <button type="button" th:action="@{/register}">Register</button>
+</form>
+</body>
+</html>

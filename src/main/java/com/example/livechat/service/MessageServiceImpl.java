@@ -1,7 +1,7 @@
 package com.example.livechat.service;
 
 import com.example.livechat.dto.MessageDTO;
-import com.example.livechat.entites.MessageEntity;
+import com.example.livechat.entities.MessageEntity;
 import com.example.livechat.mapper.MessageMapper;
 import com.example.livechat.repository.MessageRepository;
 import com.example.livechat.service.interfaces.MessageService;
