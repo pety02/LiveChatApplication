@@ -1,7 +1,7 @@
 package com.example.livechat.web;
 
-import com.example.livechat.dto.RegisterUserDTO;
-import com.example.livechat.dto.UserDTO;
+import com.example.livechat.dtoes.RegisterUserDTO;
+import com.example.livechat.dtoes.UserDTO;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -46,6 +46,6 @@ public class MainController {
         if(!model.containsAttribute("loggedInUserDTO")) {
             model.addAttribute("loggedIndUserDTO", loggedInUser);
         }
-        return "home";
+        return "index";
     }
 }

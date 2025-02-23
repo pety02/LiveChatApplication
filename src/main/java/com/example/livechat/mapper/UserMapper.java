@@ -1,6 +1,6 @@
 package com.example.livechat.mapper;
 
-import com.example.livechat.dto.UserDTO;
+import com.example.livechat.dtoes.UserDTO;
 import com.example.livechat.entities.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

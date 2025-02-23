@@ -32,14 +32,14 @@
         </div>
         <div>
             <label for="confirmPassword"></label>
-            <input type="password" name="confirmPassword" id="confirmPassword" th:field="*{confirmPassword}" placeholder="Enter Username">
+            <input type="password" name="confirmPassword" id="confirmPassword" th:field="*{confirmPassword}" placeholder="Confirm Password">
             <div th:if="${#fields.hasErrors('confirmPassword')}"
                  data-err-alert>
                 <span th:errors="*{confirmPassword}"></span>
             </div>
         </div>
         <button type="submit">Register</button>
-        <button type="button" th:action="@{/login}">Login</button>
+        <a type="button" href="/login">Login</a>
     </form>
 </body>
 </html>

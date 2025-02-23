@@ -1,4 +1,4 @@
-package com.example.livechat.dto;
+package com.example.livechat.dtoes;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,10 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterUserDTO {
+public class UserDTO {
     private Integer id;
     private String username;
     private String email;
     private String password;
-    private String confirmPassword;
 }

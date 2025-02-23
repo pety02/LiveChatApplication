@@ -1,7 +1,7 @@
 package com.example.livechat.web;
 
-import com.example.livechat.dto.RegisterUserDTO;
-import com.example.livechat.dto.UserDTO;
+import com.example.livechat.dtoes.RegisterUserDTO;
+import com.example.livechat.dtoes.UserDTO;
 import com.example.livechat.service.interfaces.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -50,9 +50,10 @@ public class UserController {
                 }
                 return "redirect:register";
             }
+            log.warn(userDTO.getId() + ", " + userDTO.getUsername() + ", " + userDTO.getEmail() + ", " + userDTO.getPassword());
             RegisterUserDTO registeredUser = userService.register(userDTO);
 
-            if (registeredUser == null) {
+            if (registeredUser == null || registeredUser.equals(new RegisterUserDTO())) {
                 String errors = "Invalid user registration data.";
                 redirectAttributes.addFlashAttribute("errors", errors);
 
@@ -80,6 +81,7 @@ public class UserController {
                         Model model,
                         RedirectAttributes redirectAttributes,
                         HttpSession httpSession) {
+        log.info("In Login controller method...");
         if(httpSession.getAttribute("loggedInUserDTO") != null) {
             httpSession.invalidate();
         }
@@ -87,24 +89,27 @@ public class UserController {
             log.error("Error logging user in: {}", bindingResult.getAllErrors());
             redirectAttributes.addFlashAttribute("loggedInUser", userDTO);
             redirectAttributes.addFlashAttribute(MODEL_KEY_PREFIX + "loggedInUser", bindingResult);
-            return "redirect:login";
+            return "redirect:/login";
         }
         try {
             UserDTO loggedInUser = userService.login(userDTO);
             if (loggedInUser == null) {
                 String errors = "Invalid user credentials.";
                 redirectAttributes.addAttribute("errors", errors);
-                return "redirect:login";
+                log.error(errors);
+                return "redirect:/login";
             }
 
+            log.info("HERE IN THE HOME PART");
             httpSession.setAttribute("loggedInUser", loggedInUser);
 
-            return "redirect:/home";
+            return "index";
         } catch (Exception e) {
+            log.error(e.getMessage());
             if (!model.containsAttribute("loggedInUser")) {
                 model.addAttribute("loggedInUser", userDTO);
             }
-            return "redirect:login";
+            return "redirect:/login";
         }
     }
 

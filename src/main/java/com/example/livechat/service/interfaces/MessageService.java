@@ -1,6 +1,6 @@
 package com.example.livechat.service.interfaces;
 
-import com.example.livechat.dto.MessageDTO;
+import com.example.livechat.dtoes.MessageDTO;
 
 public interface MessageService {
     MessageDTO sendMessage(MessageDTO messageDTO);

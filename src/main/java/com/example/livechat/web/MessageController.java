@@ -1,6 +1,6 @@
 package com.example.livechat.web;
 
-import com.example.livechat.dto.UserDTO;
+import com.example.livechat.dtoes.UserDTO;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;

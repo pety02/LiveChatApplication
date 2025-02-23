@@ -1,4 +1,4 @@
-package com.example.livechat.dto;
+package com.example.livechat.dtoes;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
