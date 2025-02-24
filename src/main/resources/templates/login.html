@@ -1,26 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
-<head th:replace="fragments/head::header"></head>
+<head th:replace="~{fragments/head::header}"></head>
 <body>
-<form th:action="@{/login}" th:object="${loggedInUserDTO}" th:method="POST">
-    <div>
-        <label for="username"></label>
-        <input type="text" name="username" id="username" th:field="*{username}" placeholder="Enter Username">
-        <div th:if="${#fields.hasErrors('username')}"
-             data-err-alert>
-            <span th:errors="*{username}"></span>
+<div class="container mt-5">
+    <form th:action="@{/login}" th:object="${loggedInUserDTO}" th:method="POST">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <!-- Username Field -->
+                <div data-mdb-input-init class="form-outline mb-3">
+                    <label class="form-label" for="username"></label>
+                    <input class="form-control" type="text" name="username" id="username"
+                           th:field="*{username}" placeholder="Enter Username">
+                    <div th:if="${#fields.hasErrors('username')}" class="alert alert-danger alert-dismissible fade show"
+                         data-err-alert>
+                        <span th:errors="*{username}" class="alert-danger"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div data-mdb-input-init class="form-outline mb-3">
+                    <label for="password"></label>
+                    <div class="input-group">
+                        <input class="form-control" type="password" name="password" id="password" th:field="*{password}" placeholder="Enter Password">
+                        <span class="input-group-text">
+                            <i class="bi bi-eye-slash" id="togglePassword" style="cursor: pointer;"></i>
+                        </span>
+                    </div>
+                    <div th:if="${#fields.hasErrors('password')}" class="alert alert-danger alert-dismissible fade show" data-err-alert>
+                        <span th:errors="*{password}" class="alert-danger"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                </div>
+
+                <!-- Login Button -->
+                <button data-mdb-button-init data-mdb-ripple-init class="btn btn-primary w-100" type="submit">Login</button>
+
+                <!-- Register Link -->
+                <div class="text-center mt-3">
+                    <a href="/register">Register</a>
+                </div>
+            </div>
         </div>
-    </div>
-    <div>
-        <label for="password"></label>
-        <input type="password" name="password" id="password" th:field="*{password}" placeholder="Enter Password">
-        <div th:if="${#fields.hasErrors('password')}"
-             data-err-alert>
-            <span th:errors="*{password}"></span>
-        </div>
-    </div>
-    <button type="submit">Login</button>
-    <a type="button" href="/register">Register</a>
-</form>
+    </form>
+</div>
+<script>
+    function togglePasswordVisibility(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+
+        icon.addEventListener("click", function () {
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("bi-eye-slash");
+                icon.classList.add("bi-eye");
+            } else {
+                input.type = "password";
+                icon.classList.remove("bi-eye");
+                icon.classList.add("bi-eye-slash");
+            }
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        togglePasswordVisibility("password", "togglePassword");
+        togglePasswordVisibility("confirmPassword", "toggleConfirmPassword");
+    });
+</script>
 </body>
 </html>
