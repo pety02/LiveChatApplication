@@ -4,6 +4,8 @@ import com.example.livechat.dtoes.RegisterUserDTO;
 import com.example.livechat.dtoes.UserDTO;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,16 +38,16 @@ public class MainController {
         return "login";
     }
 
-    @GetMapping("/home")
-    public String getHomePage(@ModelAttribute UserDTO loggedInUser,
-                              HttpSession httpSession,
-                              Model model) {
-        if(httpSession.getAttribute("loggedInUserDTO") != null) {
-            httpSession.invalidate();
+    @GetMapping("/index")
+    public String getHomePage(Model model,
+                              HttpSession httpSession) {
+
+        // Ensure `loggedInUserDTO` is added only if it's missing
+        UserDetails userDetails = (UserDetails) httpSession.getAttribute("loggedInUserDTO");
+        if (!model.containsAttribute("loggedInUserDTO") && userDetails != null) {
+            model.addAttribute("loggedInUserDTO", userDetails);
         }
-        if(!model.containsAttribute("loggedInUserDTO")) {
-            model.addAttribute("loggedIndUserDTO", loggedInUser);
-        }
+
         return "index";
     }
 }

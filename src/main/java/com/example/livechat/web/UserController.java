@@ -6,6 +6,8 @@ import com.example.livechat.service.interfaces.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Collections;
 
 import static org.springframework.validation.BindingResult.MODEL_KEY_PREFIX;
 
@@ -78,37 +82,40 @@ public class UserController {
     @PostMapping("/login")
     public String login(@ModelAttribute UserDTO userDTO,
                         BindingResult bindingResult,
-                        Model model,
                         RedirectAttributes redirectAttributes,
                         HttpSession httpSession) {
-        log.info("In Login controller method...");
-        if(httpSession.getAttribute("loggedInUserDTO") != null) {
+        // Ensure session is cleared before logging in
+        if (httpSession.getAttribute("loggedInUserDTO") != null) {
             httpSession.invalidate();
         }
+
+        // Handle validation errors
         if (bindingResult.hasErrors()) {
             log.error("Error logging user in: {}", bindingResult.getAllErrors());
-            redirectAttributes.addFlashAttribute("loggedInUser", userDTO);
-            redirectAttributes.addFlashAttribute(MODEL_KEY_PREFIX + "loggedInUser", bindingResult);
+            redirectAttributes.addFlashAttribute("loggedInUserDTO", userDTO);
+            redirectAttributes.addFlashAttribute(BindingResult.MODEL_KEY_PREFIX + "loggedInUserDTO", bindingResult);
             return "redirect:/login";
         }
+
         try {
             UserDTO loggedInUser = userService.login(userDTO);
+
+            // If login fails, show error message
             if (loggedInUser == null) {
-                String errors = "Invalid user credentials.";
-                redirectAttributes.addAttribute("errors", errors);
-                log.error(errors);
+                redirectAttributes.addFlashAttribute("errors", "Invalid user credentials.");
+                log.error("Invalid user credentials.");
                 return "redirect:/login";
             }
 
-            log.info("HERE IN THE HOME PART");
-            httpSession.setAttribute("loggedInUser", loggedInUser);
+            // Store logged-in user in session
+            UserDetails userDetails = new User(loggedInUser.getUsername(), loggedInUser.getPassword(), Collections.emptyList());
+            log.info(loggedInUser.getUsername() + ", " + loggedInUser.getPassword());
+            httpSession.setAttribute("loggedInUserDTO", userDetails);
 
-            return "index";
+            return "redirect:/index"; // Redirect to homepage after login
         } catch (Exception e) {
-            log.error(e.getMessage());
-            if (!model.containsAttribute("loggedInUser")) {
-                model.addAttribute("loggedInUser", userDTO);
-            }
+            log.error("Login error: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("errors", "An error occurred during login.");
             return "redirect:/login";
         }
     }
