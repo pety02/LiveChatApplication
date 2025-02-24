@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Registration</title>
-</head>
+<head th:replace="fragments/head::header"></head>
 <body>
     <form th:action="@{/register}" th:object="${registeredUserDTO}" th:method="POST">
         <div>
