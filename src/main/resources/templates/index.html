@@ -1,16 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
-<head th:replace="~{fragments/head::header}"></head>
+<head th:replace="~{fragments/head::header}">
+    <style>
+        #suggestions {
+            border: 1px solid #ddd;
+            max-width: 300px;
+            cursor: pointer;
+            background-color: white;
+            position: absolute;
+            z-index: 1000;
+        }
+        .suggestion-item {
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+        .suggestion-item:hover {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
 <body>
 <nav class="navbar navbar-light bg-light" th:fragment="search">
-    <form class="form-inline">
-        <label for="searchUsername"></label>
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="searchUsername" name="searchUsername">
-        <button class="btn btn-outline-info my-2 my-sm-0" type="submit">Search</button>
-    </form>
+    <div class="form-inline">
+        <input class="form-control mr-sm-2" type="text" placeholder="Search users..." aria-label="Search" id="searchInput"  onkeyup="fetchSuggestions();">
+    </div>
     <p th:if="${httpServletRequest.userPrincipal != null}"
        th:text="'Welcome, ' + ${httpServletRequest.userPrincipal.name}"></p>
     <a href="/logout">Logout</a>
 </nav>
+<div id="suggestions"></div>
+<div id="personalChat" style="visibility: hidden;">
+    <p>Chat</p>
+    <button onclick="closeChat();">X</button>
+</div>
 </body>
+<script>
+    function fetchSuggestions() {
+        let keyword = document.getElementById("searchInput").value;
+        if (keyword.length < 2) {
+            document.getElementById("suggestions").innerHTML = "";
+            return;
+        }
+
+        $.ajax({
+            url: "/api/users/search",
+            type: "GET",
+            data: { keyword: keyword },
+            success: function(response) {
+                let suggestions = response.map(user =>
+                    `<div class="suggestion-item" onclick="selectUser('${user.username}')">${user.username}</div>`).join("");
+                document.getElementById("suggestions").innerHTML = suggestions;
+            }
+        });
+    }
+
+    function selectUser(name) {
+        document.getElementById("searchInput").value = name;
+        document.getElementById("suggestions").innerHTML = "";
+        document.getElementById("personalChat").style.visibility = "visible";
+    }
+
+    function closeChat() {
+        document.getElementById("personalChat").style.visibility = "hidden";
+    }
+</script>
 </html>
