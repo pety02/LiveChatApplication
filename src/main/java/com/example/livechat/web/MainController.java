@@ -2,6 +2,7 @@ package com.example.livechat.web;
 
 import com.example.livechat.dtoes.RegisterUserDTO;
 import com.example.livechat.dtoes.UserDTO;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -39,15 +40,17 @@ public class MainController {
     }
 
     @GetMapping("/index")
-    public String getHomePage(Model model,
-                              HttpSession httpSession) {
+    public String showIndex(Model model, HttpSession httpSession, HttpServletRequest request) {
+        // Retrieve user from session
+        UserDTO loggedInUser = (UserDTO) httpSession.getAttribute("loggedInUserDTO");
 
-        // Ensure `loggedInUserDTO` is added only if it's missing
-        UserDetails userDetails = (UserDetails) httpSession.getAttribute("loggedInUserDTO");
-        if (!model.containsAttribute("loggedInUserDTO") && userDetails != null) {
-            model.addAttribute("loggedInUserDTO", userDetails);
+        model.addAttribute("httpServletRequest", request);
+        if (loggedInUser != null) {
+            model.addAttribute("loggedInUserDTO", loggedInUser);
+        } else {
+            model.addAttribute("loggedInUserDTO", null);
         }
 
-        return "index";
+        return "index";  // Return the index.html page
     }
 }

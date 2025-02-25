@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService {
@@ -46,5 +49,16 @@ public class UserServiceImpl implements UserService {
             return foundUserByUsername;
         }
         throw new RuntimeException("Sorry! You have mistaken you username or password. Please, try again!");
+    }
+
+    @Override
+    public List<UserDTO> findByUsernameContainingIgnoreCase(String keyword) {
+        List<UserEntity> foundUsersEntities = userRepository.findByUsernameContainingIgnoreCase(keyword);
+        List<UserDTO> foundUsersDTOes = new ArrayList<>();
+        for(UserEntity userEntity : foundUsersEntities) {
+            foundUsersDTOes.add(userMapper.toDTO(userEntity));
+        }
+
+        return foundUsersDTOes;
     }
 }

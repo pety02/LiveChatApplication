@@ -84,10 +84,11 @@ public class UserController {
                         BindingResult bindingResult,
                         RedirectAttributes redirectAttributes,
                         HttpSession httpSession) {
+        log.warn("in post request");
+
         // Ensure session is cleared before logging in
-        if (httpSession.getAttribute("loggedInUserDTO") != null) {
-            httpSession.invalidate();
-        }
+        httpSession.invalidate();
+        //httpSession = httpSession.getSession(true); // Recreate session
 
         // Handle validation errors
         if (bindingResult.hasErrors()) {
@@ -108,9 +109,8 @@ public class UserController {
             }
 
             // Store logged-in user in session
-            UserDetails userDetails = new User(loggedInUser.getUsername(), loggedInUser.getPassword(), Collections.emptyList());
-            log.info(loggedInUser.getUsername() + ", " + loggedInUser.getPassword());
-            httpSession.setAttribute("loggedInUserDTO", userDetails);
+            httpSession.setAttribute("loggedInUserDTO", loggedInUser);  // Store in session
+            log.info("User {} logged in successfully.", loggedInUser.getUsername());
 
             return "redirect:/index"; // Redirect to homepage after login
         } catch (Exception e) {

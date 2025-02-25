@@ -8,8 +8,8 @@
         <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="searchUsername" name="searchUsername">
         <button class="btn btn-outline-info my-2 my-sm-0" type="submit">Search</button>
     </form>
-    <p th:if="${loggedInUser != null}" th:text="'Welcome, ' + ${loggedInUser.username}"></p>
-    <p th:if="${loggedInUser == null}">Welcome, Guest</p>
+    <p th:if="${httpServletRequest.userPrincipal != null}"
+       th:text="'Welcome, ' + ${httpServletRequest.userPrincipal.name}"></p>
     <a href="/logout">Logout</a>
 </nav>
 </body>
