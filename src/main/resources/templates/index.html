@@ -1,37 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-<head th:replace="~{fragments/head::header}">
-    <style>
-        #suggestions {
-            border: 1px solid #ddd;
-            max-width: 300px;
-            cursor: pointer;
-            background-color: white;
-            position: absolute;
-            z-index: 1000;
-        }
-        .suggestion-item {
-            padding: 5px;
-            border-bottom: 1px solid #ddd;
-        }
-        .suggestion-item:hover {
-            background-color: #f2f2f2;
-        }
-    </style>
-</head>
+<head th:replace="~{fragments/head::header}"></head>
 <body>
 <nav class="navbar navbar-light bg-light" th:fragment="search">
     <div class="form-inline">
         <input class="form-control mr-sm-2" type="text" placeholder="Search users..." aria-label="Search" id="searchInput"  onkeyup="fetchSuggestions();">
+        <button class="btn btn-outline-info my-2 my-sm-0" onclick="fetchSuggestions();">Search</button>
     </div>
     <p th:if="${httpServletRequest.userPrincipal != null}"
        th:text="'Welcome, ' + ${httpServletRequest.userPrincipal.name}"></p>
     <a href="/logout">Logout</a>
 </nav>
-<div id="suggestions"></div>
-<div id="personalChat" style="visibility: hidden;">
-    <p>Chat</p>
-    <button onclick="closeChat();">X</button>
+<div class="suggestions-container">
+    <ul id="suggestions"></ul>
+</div>
+<div id="personalChat" class="chat-container">
+    <div>
+        <span id="chat-with-username" class="lead text-center">Chat with Username</span>
+        <button onclick="closeChat();" class="close-button">X</button>
+    </div>
+    <hr/>
+    <div class="old-messages"></div>
+    <div class="messages-space">
+        <input class="form-control mr-sm-2 message-area" type="text" placeholder="Enter message..." aria-label="message">
+        <button class="btn btn-outline-info my-2 my-sm-0">Send</button>
+    </div>
 </div>
 </body>
 <script>
@@ -42,26 +35,43 @@
             return;
         }
 
+        let suggestionCnt = 0;
         $.ajax({
             url: "/api/users/search",
             type: "GET",
             data: { keyword: keyword },
             success: function(response) {
-                let suggestions = response.map(user =>
-                    `<div class="suggestion-item" onclick="selectUser('${user.username}')">${user.username}</div>`).join("");
+                let suggestions = response.map(user => {
+                    suggestionCnt++; // Increment counter correctly
+                    return `<li id="suggestion${suggestionCnt}" class="suggestion"
+                            onclick="selectUser('${user.username}');"
+                            onmouseover="changeBackground(${suggestionCnt});"
+                            onmouseout="resetBackground(${suggestionCnt});">
+                            ${user.username}
+                        </li>`;
+                }).join("");
                 document.getElementById("suggestions").innerHTML = suggestions;
             }
         });
     }
 
     function selectUser(name) {
-        document.getElementById("searchInput").value = name;
+        document.getElementById("searchInput").value = "";
         document.getElementById("suggestions").innerHTML = "";
         document.getElementById("personalChat").style.visibility = "visible";
+        document.getElementById("chat-with-username").innerHTML = name;
     }
 
     function closeChat() {
         document.getElementById("personalChat").style.visibility = "hidden";
+    }
+
+    function changeBackground(no) {
+        document.getElementById(`suggestion${no}`).style.backgroundColor = "cadetblue";
+    }
+
+    function resetBackground(no) {
+        document.getElementById(`suggestion${no}`).style.backgroundColor = "";
     }
 </script>
 </html>

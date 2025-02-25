@@ -1,0 +1,71 @@
+.chat-container {
+    visibility: hidden;
+    margin-left: 20%;
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    align-items: stretch; /* Ensure that children take up the full width of the container */
+    justify-content: flex-start; /* Start the content at the top */
+    position: relative; /* Allow absolute positioning of the button */
+    width: 80%;
+    height: 650px;
+    padding: 10px;
+    border-top: 1px solid cadetblue;
+    border-bottom: 1px solid cadetblue;
+    background-color: #f8f9fa;
+}
+
+#chat-with-username {
+    text-align: center; /* Center the text horizontally */
+    font-size: 1.5rem; /* Increase the font size for the username */
+    margin-left: 50%;
+    padding: 10px 0; /* Add some padding for spacing */
+}
+
+.close-button {
+    position: absolute; /* Position the button at the top-right corner */
+    top: 10px; /* Adjust the top distance */
+    right: 10px; /* Adjust the right distance */
+    padding: 5px 10px; /* Optional: add padding to the button */
+    cursor: pointer; /* Change cursor to pointer for better UX */
+    background-color: transparent; /* Make the button background transparent */
+    border: none; /* Remove the default button border */
+    font-size: 1.5rem; /* Increase the font size of the button */
+    color: #dc3545; /* Red color for the button */
+}
+
+.chat-container div {
+    position: relative; /* This is to allow absolute positioning inside the container */
+    resize: both;
+}
+
+hr {
+    width: 100%; /* Make the horizontal line span the full width */
+    margin: 15px 0; /* Add some space before and after the line */
+    border: none;
+    border-top: 1px solid cadetblue;
+}
+
+.messages-space {
+    margin-top: 20px; /* Add space between the message input and the previous elements */
+    display: flex;
+    justify-content: space-between;
+}
+
+.message-area {
+    width: 80%; /* Make the input field take most of the width */
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+button.btn:hover {
+    background-color: #5a9f9f; /* Change button color on hover */
+}
+
+.old-messages {
+    height: 80%;
+    width: 100%;
+    flex-grow: 1; /* Make sure it fills the remaining space */
+    overflow-x: hidden;
+    overflow-y: auto;
+}
