@@ -8,6 +8,9 @@ import com.example.livechat.service.interfaces.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class MessageServiceImpl implements MessageService {
     private final MessageMapper messageMapper;
@@ -25,5 +28,16 @@ public class MessageServiceImpl implements MessageService {
         System.out.println(messageDTO);
         System.out.println(messageEntity.getId() + ", " + messageEntity.getFromUser() + ", " + messageEntity.getToUser() + ", " + messageEntity.getSentDate() + ", " + messageEntity.getContent());
         return messageMapper.toDTO(messageRepository.save(messageEntity));
+    }
+
+    @Override
+    public List<MessageDTO> fetchAllUserMessages(Integer userID, Integer friendID) {
+        List<MessageEntity> messageEntities = messageRepository.findAllByUserIDAndFriendID(userID, friendID);
+        List<MessageDTO> messageDTOS = new ArrayList<>();
+        for(MessageEntity messageEntity : messageEntities) {
+            messageDTOS.add(messageMapper.toDTO(messageEntity));
+        }
+
+        return messageDTOS;
     }
 }

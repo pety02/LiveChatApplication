@@ -3,10 +3,11 @@
 <head th:replace="~{fragments/head::header}"></head>
 <body>
 <nav class="navbar navbar-light bg-light" th:fragment="search">
-    <div class="form-inline">
-        <input class="form-control mr-sm-2" type="text" placeholder="Search users..." aria-label="Search" id="searchInput"  onkeyup="fetchSuggestions();">
-        <button class="btn btn-outline-info my-2 my-sm-0" onclick="fetchSuggestions();">Search</button>
-    </div>
+    <form id="searchForm" class="form-inline">
+        <input class="form-control mr-sm-2" type="text" placeholder="Search users..." aria-label="Search"
+               id="searchInput">
+        <button type="button" class="btn btn-outline-info my-2 my-sm-0">Search</button>
+    </form>
     <p id="greeting-p" th:if="${httpServletRequest.userPrincipal != null}"
        th:text="'Welcome, ' + ${httpServletRequest.userPrincipal.name}"></p>
     <a href="/logout">Logout</a>
@@ -17,131 +18,17 @@
 <div id="personalChat" class="chat-container">
     <div>
         <span id="chat-with-username" class="lead text-center"></span>
-        <button onclick="closeChat();" class="close-button">X</button>
+        <button id="closeChatBtn" class="close-button">X</button>
     </div>
     <hr/>
     <div class="old-messages">
         <p id="old-messages-p"></p>
     </div>
     <div class="messages-space">
-        <input id="message" class="form-control mr-sm-2 message-area" type="text" placeholder="Enter message..." aria-label="message">
-        <button class="btn btn-outline-info my-2 my-sm-0" onclick="sendMessage()">Send</button>
+        <input id="message" class="form-control mr-sm-2 message-area" type="text" placeholder="Enter message..."
+               aria-label="message">
+        <button id="sendMessageBtn" class="btn btn-outline-info my-2 my-sm-0">Send</button>
     </div>
 </div>
 </body>
-<script>
-    let usersMap = {};
-    let toUser = null;
-    let fromUser = null;
-
-    function fetchSuggestions() {
-        let keyword = document.getElementById("searchInput").value;
-        if (keyword.length < 2) {
-            document.getElementById("suggestions").innerHTML = "";
-            return;
-        }
-
-        let suggestionCnt = 0;
-        $.ajax({
-            url: "/api/users/search",
-            type: "GET",
-            data: { keyword: keyword },
-            success: function(response) {
-                let suggestions = response.map(user => {
-                    usersMap[user.username] = user.id;
-                    suggestionCnt++; // Increment counter correctly
-                    return `<li id="suggestion${suggestionCnt}" class="suggestion"
-                            onclick="selectUser('${user.username}');"
-                            onmouseover="changeBackground(${suggestionCnt});"
-                            onmouseout="resetBackground(${suggestionCnt});">
-                            ${user.username}
-                        </li>`;
-                }).join("");
-                document.getElementById("suggestions").innerHTML = suggestions;
-            }
-        });
-    }
-
-    function selectUser(name) {
-        document.getElementById("searchInput").value = "";
-        document.getElementById("suggestions").innerHTML = "";
-        document.getElementById("personalChat").style.visibility = "visible";
-        document.getElementById("chat-with-username").innerHTML = name;
-        toUser = name;
-    }
-
-    function closeChat() {
-        document.getElementById("personalChat").style.visibility = "hidden";
-    }
-
-    function changeBackground(no) {
-        document.getElementById(`suggestion${no}`).style.backgroundColor = "cadetblue";
-    }
-
-    function resetBackground(no) {
-        document.getElementById(`suggestion${no}`).style.backgroundColor = "";
-    }
-
-
-
-    <!-- CHAT functions -->
-    let stompClient = null;
-
-    function connect() {
-        let socket = new SockJS('/chat');
-        stompClient = Stomp.over(socket);
-        stompClient.connect({}, function (frame) {
-            console.log('Connected: ' + frame);
-            stompClient.subscribe('/topic/public', function (message) {
-                showMessage(JSON.parse(message.body));
-            });
-        });
-    }
-
-    function sendMessage() {
-        fromUser = document.getElementById("greeting-p").innerHTML.substring(9);
-        let messageContent = document.getElementById("message").value;
-        if (messageContent) {
-            let now = new Date().getTime();
-            let message = {
-                fromUser: fromUser,
-                toUser: toUser,
-                sentDate: now,
-                content: messageContent
-            };
-            stompClient.send("/api/chat.sendMessage", {}, JSON.stringify(message));
-            showMessage(message);
-            document.getElementById("message").value = '';
-
-            <!-- Send the message to the database -->
-            let messageDTO = {
-                fromUser: usersMap[fromUser],
-                toUser: usersMap[toUser],
-                sentDate: now,
-                content: messageContent
-            };
-            console.log(messageDTO);
-            $.ajax({
-                url: "/api/send-message",
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify(messageDTO),
-                success: function(response) {
-                    console.log("Message saved:", response);
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error saving message:", xhr.responseText);
-                }
-            });
-
-        }
-    }
-
-    function showMessage(message) {
-        let messageElement = document.getElementById("old-messages-p");
-        messageElement.innerHTML += (message.fromUser + ": " + message.content + '\n');
-    }
-
-    connect();
-</script>
 </html>

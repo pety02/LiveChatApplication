@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function () {
     function togglePasswordVisibility(inputId, iconId) {
         const input = document.getElementById(inputId);

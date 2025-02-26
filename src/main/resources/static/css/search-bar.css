@@ -25,3 +25,19 @@
     background-color: cadetblue;
     color: white;
 }
+
+.visible {
+    visibility: visible;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.cadetBlueBackground {
+    background-color: cadetblue;
+}
+
+.beigeBackground {
+    background-color: beige;
+}
