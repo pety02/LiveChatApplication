@@ -22,6 +22,8 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public MessageDTO sendMessage(MessageDTO messageDTO) {
         MessageEntity messageEntity = messageMapper.toEntity(messageDTO);
+        System.out.println(messageDTO);
+        System.out.println(messageEntity.getId() + ", " + messageEntity.getFromUser() + ", " + messageEntity.getToUser() + ", " + messageEntity.getSentDate() + ", " + messageEntity.getContent());
         return messageMapper.toDTO(messageRepository.save(messageEntity));
     }
 }

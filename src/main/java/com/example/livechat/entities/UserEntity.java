@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name = "USER", schema = "public", catalog = "LiveChatDB")
+@Table(name = "user", schema = "public", catalog = "LiveChatDB")
 public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

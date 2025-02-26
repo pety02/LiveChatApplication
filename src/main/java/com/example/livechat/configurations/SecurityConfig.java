@@ -17,6 +17,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+                .csrf(configurer ->
+                        configurer.ignoringRequestMatchers("/api/send-message"))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/register").permitAll()  // Allow only for unauthenticated users
                         .requestMatchers("/index").authenticated()           // Require authentication for /index

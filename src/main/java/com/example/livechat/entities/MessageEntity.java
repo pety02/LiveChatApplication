@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
-@Table(name = "MESSAGE", schema = "public", catalog = "LiveChatDB")
+@Table(name = "message", schema = "public", catalog = "LiveChatDB")
 public class MessageEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
